@@ -21,8 +21,7 @@ public class StocValidator implements Validator<Stoc> {
         if (stoc.getStocMinim() < 0)
             errors += "Stoc minim negativ!\n";
 
-        if (stoc.getCantitate() < stoc.getStocMinim())
-            errors += "Cantitatea este sub stocul minim!\n";
+        // am eliminat validarea care bloca vanzarea daca cantitatea ajunge sub stoc minim
 
         if (!errors.isEmpty())
             throw new ValidationException(errors);

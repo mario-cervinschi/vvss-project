@@ -127,13 +127,39 @@ public class DrinkShopController {
             alert.showAndWait();
             return;
         }
-        Product p = new Product(r.getId(),
-                txtProdName.getText(),
-                Double.parseDouble(txtProdPrice.getText()),
-                comboProdCategorie.getValue(),
-                comboProdTip.getValue());
-        service.addProduct(p);
-        initData();
+        try {
+            // 3. CORETIE C06: Validam input-ul pentru pret
+            String priceText = txtProdPrice.getText();
+            if (priceText == null || priceText.isBlank()) {
+                showError("Campul pentru pret nu poate fi gol.");
+                return;
+            }
+
+            double price = Double.parseDouble(priceText);
+
+            // Verificam sa nu fie negativ
+            if (price < 0) {
+                showError("Prețul nu poate fi negativ.");
+                return;
+            }
+
+
+            // Dacă totul e OK, creăm produsul
+            Product p = new Product(
+                    r.getId(),
+                    txtProdName.getText(),
+                    price,
+                    comboProdCategorie.getValue(),
+                    comboProdTip.getValue()
+            );
+
+            service.addProduct(p);
+            initData();
+
+        } catch (NumberFormatException e) {
+            // Aici prindem eroarea dacă parseDouble esueaza (ex: utilizatorul a scris "abc")
+            showError("Pret invalid! Va rugam să introduceti un numar valid (ex: 15.5).");
+        }
     }
 
     @FXML
@@ -179,7 +205,13 @@ public class DrinkShopController {
 
     @FXML
     private void onAddNewReteta() {
-        Reteta r = new Reteta(service.getAllRetete().size()+1, new ArrayList<>(newRetetaList));
+        // 4. CORECTIE C01 - asiguram unicitatea id urilor la creare
+        int nextId = service.getAllRetete().stream()
+                .mapToInt(Reteta::getId)
+                .max()
+                .orElse(0) + 1;
+
+        Reteta r = new Reteta(nextId, new ArrayList<>(newRetetaList));
         service.addReteta(r);
         newRetetaList.clear();
         initData();
