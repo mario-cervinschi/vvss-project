@@ -11,7 +11,6 @@ public abstract class FileAbstractRepository<ID, E>
 
     public FileAbstractRepository(String fileName) {
         this.fileName = fileName;
-        //loadFromFile();
     }
 
     protected void loadFromFile() {

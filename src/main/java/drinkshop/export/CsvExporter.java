@@ -8,10 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 public class CsvExporter {
+    private CsvExporter() { throw new IllegalStateException("Utility class"); }
     public static void exportOrders(List<Product> products, List<Order> orders, String path) {
         try (FileWriter w = new FileWriter(path)) {
             w.write("OrderId,Product,Quantity,Price\n");

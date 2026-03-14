@@ -46,13 +46,13 @@ public class ProductService {
         if (categorie == CategorieBautura.ALL) return getAllProducts();
         return getAllProducts().stream()
                 .filter(p -> p.getCategorie() == categorie)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<Product> filterByTip(TipBautura tip) {
         if (tip == TipBautura.ALL) return getAllProducts();
         return getAllProducts().stream()
                 .filter(p -> p.getTip() == tip)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
