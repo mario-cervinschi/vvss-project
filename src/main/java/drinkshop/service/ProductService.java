@@ -2,6 +2,8 @@ package drinkshop.service;
 
 import drinkshop.domain.*;
 import drinkshop.repository.Repository;
+import drinkshop.service.validator.ProductValidator;
+import drinkshop.service.validator.Validator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,18 +11,26 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final Repository<Integer, Product> productRepo;
-
+    private Validator<Product> validator;
     public ProductService(Repository<Integer, Product> productRepo) {
         this.productRepo = productRepo;
+        this.validator = new ProductValidator();
     }
 
     public void addProduct(Product p) {
+        if (validator != null) {
+            validator.validate(p);
+        }
         productRepo.save(p);
     }
 
     public void updateProduct(int id, String name, double price, CategorieBautura categorie, TipBautura tip) {
         Product updated = new Product(id, name, price, categorie, tip);
         productRepo.update(updated);
+    }
+
+    public void setValidator(Validator<Product> validator) {
+        this.validator = validator;
     }
 
     public void deleteProduct(int id) {
