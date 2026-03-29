@@ -25,11 +25,17 @@ class ProductServiceTest {
         service.setValidator(new ProductValidator());
     }
 
+    private final CategorieBautura dummyCategory = null;
+    private final TipBautura dummyType = null;
+
     @RepeatedTest(1)
     @Tag("ECP")
     @DisplayName("ECP valid - produs corect")
     void testECPValid() {
-        Product p = new Product(1, "cola", 10, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", 10, dummyCategory, dummyType);
+
+        // Act & Assert
         assertDoesNotThrow(() -> service.addProduct(p));
     }
 
@@ -37,7 +43,10 @@ class ProductServiceTest {
     @Tag("ECP")
     @DisplayName("ECP invalid - nume gol")
     void testECPInvalidNume() {
-        Product p = new Product(1, "", 10, null, null);
+        // Arrange
+        Product p = new Product(1, "", 10, dummyCategory, dummyType);
+
+        // Act & Assert
         assertThrows(ValidationException.class, () -> service.addProduct(p));
     }
 
@@ -45,7 +54,10 @@ class ProductServiceTest {
     @Tag("ECP")
     @DisplayName("ECP invalid - pret negativ")
     void testECPInvalidPret() {
-        Product p = new Product(1, "cola", -5, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", -5, dummyCategory, dummyType);
+
+        // Act & Assert
         assertThrows(ValidationException.class, () -> service.addProduct(p));
     }
 
@@ -53,7 +65,10 @@ class ProductServiceTest {
     @Tag("BVA")
     @DisplayName("BVA invalid - pret = -1")
     void testBVAInvalidMinusOne() {
-        Product p = new Product(1, "cola", -1, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", -1, dummyCategory, dummyType);
+
+        // Act & Assert
         assertThrows(ValidationException.class, () -> service.addProduct(p));
     }
 
@@ -61,7 +76,10 @@ class ProductServiceTest {
     @Tag("BVA")
     @DisplayName("BVA invalid - pret = 0")
     void testBVAInvalidZero() {
-        Product p = new Product(1, "cola", 0, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", 0, dummyCategory, dummyType);
+
+        // Act & Assert
         assertThrows(ValidationException.class, () -> service.addProduct(p));
     }
 
@@ -69,7 +87,10 @@ class ProductServiceTest {
     @Tag("BVA")
     @DisplayName("BVA valid - pret = 1")
     void testBVAValidOne() {
-        Product p = new Product(1, "cola", 1, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", 1, dummyCategory, dummyType);
+
+        // Act & Assert
         assertDoesNotThrow(() -> service.addProduct(p));
     }
 
@@ -77,7 +98,32 @@ class ProductServiceTest {
     @Tag("BVA")
     @DisplayName("BVA valid - pret = 2")
     void testBVAValidTwo() {
-        Product p = new Product(1, "cola", 2, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", 2, dummyCategory, dummyType);
+
+        // Act & Assert
+        assertDoesNotThrow(() -> service.addProduct(p));
+    }
+
+    @RepeatedTest(1)
+    @Tag("BVA")
+    @DisplayName("BVA invalid - nume prea scurt (lungime 1)")
+    void testBVAInvalidNumeLengthOne() {
+        // Arrange
+        Product p = new Product(1, "A", 10, dummyCategory, dummyType);
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> service.addProduct(p));
+    }
+
+    @RepeatedTest(1)
+    @Tag("BVA")
+    @DisplayName("BVA valid - nume minim acceptat (lungime 2)")
+    void testBVAValidNumeLengthTwo() {
+        // Arrange
+        Product p = new Product(1, "Ab", 10, dummyCategory, dummyType);
+
+        // Act & Assert
         assertDoesNotThrow(() -> service.addProduct(p));
     }
 
@@ -86,7 +132,10 @@ class ProductServiceTest {
     @ValueSource(doubles = {-10, 0})
     @DisplayName("BVA invalid - preturi multiple")
     void testBVAInvalidMultiple(double pret) {
-        Product p = new Product(1, "cola", pret, null, null);
+        // Arrange
+        Product p = new Product(1, "cola", pret, dummyCategory, dummyType);
+
+        // Act & Assert
         assertThrows(ValidationException.class, () -> service.addProduct(p));
     }
 }
