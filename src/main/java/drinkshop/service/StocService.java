@@ -33,9 +33,16 @@ public class StocService {
     }
 
     public boolean areSuficient(Reteta reteta) {
+        if (reteta == null) return false;
+
         List<IngredientReteta> ingredienteNecesare = reteta.getIngrediente();
 
+        if (ingredienteNecesare.isEmpty()) return true;
+
         for (IngredientReteta e : ingredienteNecesare) {
+
+            if (e.getCantitate() <= 0) continue;
+
             String ingredient = e.getDenumire();
             double necesar = e.getCantitate();
 
@@ -44,10 +51,15 @@ public class StocService {
                     .mapToDouble(Stoc::getCantitate)
                     .sum();
 
+            if (disponibil == 0) {
+                return false;
+            }
+
             if (disponibil < necesar) {
                 return false;
             }
         }
+
         return true;
     }
 
