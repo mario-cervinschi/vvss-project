@@ -9,6 +9,9 @@ public class OrderItemValidator implements Validator<OrderItem> {
 
         String errors = "";
 
+        if (item == null)
+            errors +="OrderItem null\n";
+
         if (item.getProduct().getId() <= 0)
             errors += "Product ID invalid!\n";
 

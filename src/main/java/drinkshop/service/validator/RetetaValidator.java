@@ -13,6 +13,9 @@ public class RetetaValidator implements Validator<Reteta> {
 
         AtomicReference<String> errors = new AtomicReference<>("");
 
+        if (reteta == null)
+            errors.accumulateAndGet("Reteta null\n", String::concat);
+
         if (reteta.getId() <= 0)
             errors.accumulateAndGet("Product ID invalid!\n", String::concat);
 

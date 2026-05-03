@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DrinkShopController {
@@ -119,47 +120,28 @@ public class DrinkShopController {
             alert.setHeaderText("Selectati o reteta pentru care adugati un produs");
             alert.showAndWait();
             return;
-        }else
-        if (service.getAllProducts().stream().filter(p->p.getId()==r.getId()).toList().size()>0) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Error");
-            alert.setHeaderText("Exista un produs cu reteta adaugata.");
-            alert.showAndWait();
-            return;
-        }
-        try {
-            // 3. CORETIE C06: Validam input-ul pentru pret
-            String priceText = txtProdPrice.getText();
-            if (priceText == null || priceText.isBlank()) {
-                showError("Campul pentru pret nu poate fi gol.");
+        }else {
+            List<Product> list = new ArrayList<>();
+            for (Product p : service.getAllProducts()) {
+                if (p.getId() == r.getId()) {
+                    list.add(p);
+                }
+            }
+            if (!list.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Error");
+                alert.setHeaderText("Exista un produs cu reteta adaugata.");
+                alert.showAndWait();
                 return;
             }
-
-            double price = Double.parseDouble(priceText);
-
-            // Verificam sa nu fie negativ
-            if (price < 0) {
-                showError("Prețul nu poate fi negativ.");
-                return;
-            }
-
-
-            // Dacă totul e OK, creăm produsul
-            Product p = new Product(
-                    r.getId(),
-                    txtProdName.getText(),
-                    price,
-                    comboProdCategorie.getValue(),
-                    comboProdTip.getValue()
-            );
-
-            service.addProduct(p);
-            initData();
-
-        } catch (NumberFormatException e) {
-            // Aici prindem eroarea dacă parseDouble esueaza (ex: utilizatorul a scris "abc")
-            showError("Pret invalid! Va rugam să introduceti un numar valid (ex: 15.5).");
         }
+        Product p = new Product(r.getId(),
+                txtProdName.getText(),
+                Double.parseDouble(txtProdPrice.getText()),
+                comboProdCategorie.getValue(),
+                comboProdTip.getValue());
+        service.addProduct(p);
+        initData();
     }
 
     @FXML
@@ -205,13 +187,7 @@ public class DrinkShopController {
 
     @FXML
     private void onAddNewReteta() {
-        // 4. CORECTIE C01 - asiguram unicitatea id urilor la creare
-        int nextId = service.getAllRetete().stream()
-                .mapToInt(Reteta::getId)
-                .max()
-                .orElse(0) + 1;
-
-        Reteta r = new Reteta(nextId, new ArrayList<>(newRetetaList));
+        Reteta r = new Reteta(service.getAllRetete().size()+1, new ArrayList<>(newRetetaList));
         service.addReteta(r);
         newRetetaList.clear();
         initData();

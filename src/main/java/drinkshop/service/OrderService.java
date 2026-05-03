@@ -42,19 +42,7 @@ public class OrderService {
 
     public double computeTotal(Order o) {
         return o.getItems().stream()
-                .mapToDouble(i -> {
-                    Product p = productRepo.findOne(i.getProduct().getId());
-
-                    // Corectie Defect C05: Verificam daca produsul exista
-                    if (p != null) {
-                        return p.getPret() * i.getQuantity();
-                    } else {
-                        // Logam eroarea pentru a identifica produsul problematic
-                        System.err.println("EROARE (C05): Produsul cu ID " + i.getProduct().getId() +
-                                " nu a fost gasit în repository pentru comanda " + o.getId());
-                        return 0.0;
-                    }
-                })
+                .mapToDouble(i -> productRepo.findOne(i.getProduct().getId()).getPret() * i.getQuantity())
                 .sum();
     }
 

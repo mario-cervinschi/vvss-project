@@ -9,6 +9,9 @@ public class StocValidator implements Validator<Stoc> {
 
         String errors = "";
 
+        if (stoc == null)
+            errors +="Stoc null\n";
+
         if (stoc.getId() <= 0)
             errors += "ID invalid!\n";
 
@@ -21,7 +24,8 @@ public class StocValidator implements Validator<Stoc> {
         if (stoc.getStocMinim() < 0)
             errors += "Stoc minim negativ!\n";
 
-        // am eliminat validarea care bloca vanzarea daca cantitatea ajunge sub stoc minim
+        if (stoc.getCantitate() < stoc.getStocMinim())
+            errors += "Cantitatea este sub stocul minim!\n";
 
         if (!errors.isEmpty())
             throw new ValidationException(errors);

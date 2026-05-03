@@ -4,7 +4,10 @@ import drinkshop.domain.IngredientReteta;
 import drinkshop.domain.Reteta;
 import drinkshop.domain.Stoc;
 import drinkshop.repository.Repository;
+import drinkshop.service.validator.StocValidator;
+import drinkshop.service.validator.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +15,11 @@ public class StocService {
 
     private final Repository<Integer, Stoc> stocRepo;
 
-    public StocService(Repository<Integer, Stoc> stocRepo) {
+    private final Validator<Stoc> stocValidator;
+
+    public StocService(Repository<Integer, Stoc> stocRepo, Validator<Stoc> stocValidator) {
         this.stocRepo = stocRepo;
+        this.stocValidator = stocValidator;
     }
 
     public List<Stoc> getAll() {
@@ -21,6 +27,7 @@ public class StocService {
     }
 
     public void add(Stoc s) {
+        stocValidator.validate(s);
         stocRepo.save(s);
     }
 
@@ -33,16 +40,9 @@ public class StocService {
     }
 
     public boolean areSuficient(Reteta reteta) {
-        if (reteta == null) return false;
-
         List<IngredientReteta> ingredienteNecesare = reteta.getIngrediente();
 
-        if (ingredienteNecesare.isEmpty()) return true;
-
         for (IngredientReteta e : ingredienteNecesare) {
-
-            if (e.getCantitate() <= 0) continue;
-
             String ingredient = e.getDenumire();
             double necesar = e.getCantitate();
 
@@ -51,15 +51,10 @@ public class StocService {
                     .mapToDouble(Stoc::getCantitate)
                     .sum();
 
-            if (disponibil == 0) {
-                return false;
-            }
-
             if (disponibil < necesar) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -72,9 +67,12 @@ public class StocService {
             String ingredient = e.getDenumire();
             double necesar = e.getCantitate();
 
-            List<Stoc> ingredienteStoc = stocRepo.findAll().stream()
-                    .filter(s -> s.getIngredient().equalsIgnoreCase(ingredient))
-                    .toList();
+            List<Stoc> ingredienteStoc = new ArrayList<>();
+            for (Stoc stoc : stocRepo.findAll()) {
+                if (stoc.getIngredient().equalsIgnoreCase(ingredient)) {
+                    ingredienteStoc.add(stoc);
+                }
+            }
 
             double ramas = necesar;
 
