@@ -2,62 +2,58 @@ package drinkshop.it.service.td.depthfirst;
 
 import drinkshop.domain.Stoc;
 import drinkshop.repository.Repository;
+import drinkshop.repository.file.FileStocRepository;
 import drinkshop.service.StocService;
-import drinkshop.service.validator.StocValidator;
 import drinkshop.service.validator.ValidationException;
+import drinkshop.service.validator.Validator;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
+// S ---> R ---> E, depth-first
+
+// Unit tests
+// Step3: S, R, E real, V mock
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StocServiceLevel2StocIntTest {
-    private Stoc stoc;
-    private StocValidator stocValidator; // REAL
+    private Validator<Stoc> stocValidator;
     private Repository<Integer, Stoc> stocRepo;
-
     private StocService stocService;
 
     @BeforeEach
     void setUp() {
-        stocValidator = new StocValidator();
-        stocRepo = mock(Repository.class);
-        stoc = null; // integram primul branch, al doilea nivel (top down depth first)
+        stocValidator = mock(Validator.class); // V - mocked
+        stocRepo = new FileStocRepository("data/stocuri.txt"); // R - real
+        // E - real
         stocService = new StocService(stocRepo, stocValidator);
     }
 
     @Test
     @Order(1)
-    void testAddValid_withRealStoc() {
-        Stoc stoc = new Stoc(1, "Apa", 5.0, 1.0);
-        //asociem comportamentul pentru obiectele mock
-        when(stocRepo.save(stoc)).thenReturn(stoc);
+    void testAddValid_realRepoAndStoc() {
+        Stoc stoc = new Stoc(12, "Cafea", 3.0, 1.0);
+        doNothing().when(stocValidator).validate(stoc);
 
-        //apelam metoda add si evaluam apelul cu fail
-        try{
+        try {
             stocService.add(stoc);
-        }catch (Exception e){
-            fail("Invalid add operation " + e);
+        } catch (Exception e) {
+            fail("Should not throw: " + e);
         }
 
-        // verificam interactiunea obiectului testat cu obiectele mock ramase, i.e., repository
-        verify(stocRepo, times(1)).save(stoc);
+        verify(stocValidator, times(1)).validate(stoc);
     }
 
     @Test
     @Order(2)
-    void testAddInvalid_withRealStoc() {
-        Stoc stoc = new Stoc(-1, "Apa", 5, 10);
+    void testAddInvalid_realRepoAndStoc() {
+        Stoc stoc = new Stoc(-2, "", 0.0, 5.0);
+        doThrow(new ValidationException("ID invalid!\n")).when(stocValidator).validate(stoc);
 
-        //asociem comportamente obiectelor mock
-        when(stocRepo.save(stoc)).thenReturn(stoc);//nu se va ajunge la apelul metodei save
-
-        //apelam metoda si evaluam invalidarea obiectului
         Assertions.assertThrows(ValidationException.class, () -> {
             stocService.add(stoc);
         });
 
-        //verificam interactiunea obiectului testat cu obiectele mock ramase, i.e., repository, dar nu se ajunge la verificarea interactiunii
-        verify(stocRepo, never()).save(any());
+        verify(stocValidator, times(1)).validate(stoc);
     }
 }

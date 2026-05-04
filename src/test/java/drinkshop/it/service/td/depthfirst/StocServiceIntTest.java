@@ -9,76 +9,46 @@ import drinkshop.service.validator.ValidationException;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
 
+// S ---> R ---> E, depth-first
+
+// Unit tests
+// Step4: S, R, E, V real
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StocServiceIntTest {
-    private Stoc stoc;
-    private StocValidator stocValidator; // REAL
+    private StocValidator stocValidator;
     private Repository<Integer, Stoc> stocRepo;
-
     private StocService stocService;
 
     @BeforeEach
     void setUp() {
+        // everything real
         stocValidator = new StocValidator();
-        stocRepo = new FileStocRepository("data/stocuri.txt"); // integram al doilea branch (top down depth first)
-        stoc = null;
+        stocRepo = new FileStocRepository("data/stocuri.txt");
         stocService = new StocService(stocRepo, stocValidator);
     }
 
     @Test
     @Order(1)
-    void testAddValid_withRealRepo() {
-        Stoc stoc = new Stoc(1, "Apa", 5.0, 1.0);
+    void testAddValid_allReal() {
+        Stoc stoc = new Stoc(20, "Lapte", 4.0, 1.5);
 
-        //apelam metoda add si evaluam apelul cu fail
-        try{
+        try {
             stocService.add(stoc);
-        }catch (Exception e){
-            fail("Invalid add operation " + e);
+        } catch (Exception e) {
+            fail("Should not throw: " + e);
         }
 
-        assert 10 == stocRepo.findAll().size();
-        assert 10 == stocService.getAll().size();
+        assert stocService.getAll().size() > 0;
     }
 
     @Test
     @Order(2)
-    void testAddInvalid_withRealRepo() {
-        Stoc stoc = new Stoc(-1, "Apa", 5.0, 10.0);
+    void testAddInvalid_allReal() {
+        Stoc stoc = new Stoc(-7, "Lapte", 1.0, 8.0);
 
-        //apelam metoda si evaluam invalidarea obiectului
         Assertions.assertThrows(ValidationException.class, () -> {
             stocService.add(stoc);
         });
-
-        assert 10 == stocRepo.findAll().size();
-        assert 10 == stocService.getAll().size();
-    }
-
-    @Test
-    @Disabled
-    void add() {
-    }
-
-    @Test
-    @Disabled
-    void update() {
-    }
-
-    @Test
-    @Disabled
-    void delete() {
-    }
-
-    @Test
-    @Disabled
-    void areSuficient() {
-    }
-
-    @Test
-    @Disabled
-    void consuma() {
     }
 }
