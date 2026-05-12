@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: drinkshop.tests.StocServiceTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.013 s <<< FAILURE! -- in drinkshop.tests.StocServiceTest
+drinkshop.tests.StocServiceTest.testAreSuficient_RetetaNull -- Time elapsed: 0 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "drinkshop.domain.Reteta.getIngrediente()" because "reteta" is null
+	at drinkshop.service.StocService.areSuficient(StocService.java:43)
+	at drinkshop.tests.StocServiceTest.testAreSuficient_RetetaNull(StocServiceTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
